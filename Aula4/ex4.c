@@ -12,6 +12,8 @@ int main(void){
 
     while(1){
         LATD = LATD & 0x00FF;
+        LATB = LATB & 0x00FF;
+
         if(counter == 1){
             // display da direita (D5)
             LATDbits.LATD5 = 1;
@@ -24,40 +26,42 @@ int main(void){
             counter = 1;
         }
 
-        for(i=0 ; i<7 ; i++){
-            delay(250);
+        for(i=0 ; i<8 ; i++){
+            delay(500);
+            printf("%d\n",i);
             // char segment
             // LATB = LATB | segment << 8;
-            switch(segment){    
-                case 'a':
+            switch(i){    
+                case 1:
                     LATBbits.LATB8 = 1;
                     break;
-                case 'b':
+                case 2:
                     LATBbits.LATB9 = 1;
                     break;
-                case 'c':
+                case 3:
                     LATBbits.LATB10 = 1;
                     break;
-                case 'd':
+                case 4:
                     LATBbits.LATB11 = 1;
                     break;
-                case 'e':
+                case 5:
                     LATBbits.LATB12 = 1;
                     break;
-                case 'f':
+                case 6:
                     LATBbits.LATB13 = 1;
                     break;
-                case 'g':
+                case 7:
                     LATBbits.LATB14 = 1;
                     break;
             }
-            segment++;
         }
         // meter o ponto a piscar 3 vezes antes de trocar de display
         for(i=0 ; i<3 ; i++){
-            LATBbits.LATB15 = 1;
-            delay(125);
-            LATBbits.LATB15 = 0;
+            delay(500);
+            printf("%d\n",i);
+            LATB = LATB & 0x00FF;
+            delay(500);
+            LATB = 0xFFFF;
         }
         segment = 'a';
     }   
