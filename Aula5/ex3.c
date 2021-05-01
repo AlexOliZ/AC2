@@ -2,7 +2,6 @@
 #include "delay.c"
 
 int main(void){
-
     TRISBbits.TRISB4 = 1;       // RBx digital output disconnected 
     AD1PCFGbits.PCFG4 = 0;      // RBx configured as analog input (AN4)
     AD1CON1bits.SSRC = 7;       // Conversion trigger selection bits: in this
@@ -24,7 +23,7 @@ int main(void){
     AD1CON1bits.ON = 1;         // Enable A/D converter 
                                 // This must the last command of the A/D
                                 // configuration sequence 
-
+    int i = 0;
     while(1){
         // start conversion
         AD1CON1bits.ASAM = 1;
@@ -33,11 +32,15 @@ int main(void){
         while(IFS1bits.AD1IF == 0);
         
         //Read conversion result (ADC1BUF0 value) and print it
-        printInt(ADC1BUF0, 16 | 3 << 16);
-        delay(200);
-        putChar(' ');
+        int *p = (int*)(&ADC1BUF0);
+        for(i=0;i<16;i++){
+            printInt(p[i*4], 10 | 4 << 16);
+            putChar(' ');
+        }
+        putChar('\n');
         // Reset AD1IF
         IFS1bits.AD1IF = 0;
+        delay(1000);
     }
     
     return 0;
