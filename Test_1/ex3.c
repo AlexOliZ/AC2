@@ -2,8 +2,8 @@
 
 void delay(unsigned int ms){
     for(;ms>0;ms--){
-        RESET_CORE_TIMER();
-        while(READ_CORE_TIMER() < 20000)
+        resetCoreTimer();
+        while(readCoreTimer()<20000);
     }
 
 }
@@ -27,7 +27,7 @@ void send2display(unsigned int value){
 }
 
 int main(void){
-
+    int N = 4;
     TRISDbits.TRISD5 = 0;
     TRISDbits.TRISD6 = 0;
 
@@ -42,7 +42,7 @@ int main(void){
                                 // hardware clears the ASAM bit 
     
     AD1CON3bits.SAMC = 16;      // Sample time is 16 TAD (TAD = 100 ns) 
-    AD1CON2bits.SMPI = 0;       // Interrupt is generated after XX samples 
+    AD1CON2bits.SMPI = N-1;       // Interrupt is generated after XX samples 
                                 // (replace XX by the desired number of
                                 // consecutive samples) 
     
@@ -55,20 +55,29 @@ int main(void){
     unsigned int ms=0;
     unsigned int value=0;
     unsigned int freq=0;
-    unsigned int counter = 0x00FF;
+    unsigned int soma=0;
+    unsigned int i=0;
+    int counter = 0x00FF;
 
     while(1){
         counter = counter & 0x00FF;
+        soma=0;
         send2display(counter);
 
         AD1CON1bits.ASAM = 1;
         while(IFS1bits.AD1IF == 0);
-
-        value = ADC1BUF0;
-        freq = 1+val/256;
+        int* p = (int*) (&ADC1BUF0);
+        for(i=0;i<N;i++){
+            soma += p[i*4];
+        }
+        value = soma/N;
+        freq = 1+value/256;
         ms = 1/freq;
-        
-        delay(ms);
+        printInt(value,10);
+        putChar('\n');
+        printInt(counter,10);
+        putChar('\n');
+        delay(ms*10);
         //if(counter == 0)
         //   counter = 0x01FF;
         counter-=1;

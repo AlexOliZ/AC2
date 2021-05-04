@@ -6,6 +6,8 @@
 
 .data 
 .equ inkey,1
+.equ    READ_CORE_TIMER,11        
+.equ    RESET_CORE_TIMER,12   
 .text 
 .globl main
 
@@ -18,38 +20,43 @@ main:
     sw $s2,12($sp)
     lui $s0,SFR_BASE_HI
 
-    lw $t0,TRISE($s0)
-    andi $t0,$t0,0xFFE0
-    sw $t0,TRISE($s0)
+    lw $s1,TRISE($s0)
+    andi $s1,$s1,0xFFE0
+    sw $s1,TRISE($s0)
 
 while:
     li $v0,inkey
     syscall
-
+    move $s2,$v0
+    andi $s2,$s2,0x0F
 
 case_0:
+    bne $s2,0,case_1
     lw $t0,LATE($s0)
-    andi $t0,$t0,0xFFE1
+    li $t0,0x01
     sw $t0,LATE($s0)
     j end_case
 case_1:
+    bne $s2,1,case_2
     lw $t0,LATE($s0)
-    andi $t0,$t0,0xFFE2
+    li $t0,0x02
     sw $t0,LATE($s0)
     j end_case
 case_2:
+    bne $s2,2,case_3
     lw $t0,LATE($s0)
-    andi $t0,$t0,0xFFE4
+    li $t0,0x04
     sw $t0,LATE($s0)
     j end_case
 case_3:
+    bne $s2,3,default
     lw $t0,LATE($s0)
-    andi $t0,$t0,0xFFE8
+    li $t0,0x08
     sw $t0,LATE($s0)
     j end_case
 default:
     lw $t0,LATE($s0)
-    andi $t0,$t0,0xFFF0
+    li $t0,0x10
     sw $t0,LATE($s0)
     li $a0,2000
     jal delay
