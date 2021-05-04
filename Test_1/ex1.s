@@ -10,19 +10,50 @@
 .globl main
 
 
-
-
 main:
     addiu $sp,$sp,-16
     sw $ra,0($sp)
     sw $s0,4($sp)
     sw $s1,8($sp)
     sw $s2,12($sp)
+    lui $s0,SFR_BASE_HI
+
+    lw $t0,TRISE($s0)
+    andi $t0,$t0,0xFFE0
+    sw $t0,TRISE($s0)
+
 while:
+    li $v0,inkey
+    syscall
 
 
-    
-
+case_0:
+    lw $t0,LATE($s0)
+    andi $t0,$t0,0xFFE1
+    sw $t0,LATE($s0)
+    j end_case
+case_1:
+    lw $t0,LATE($s0)
+    andi $t0,$t0,0xFFE2
+    sw $t0,LATE($s0)
+    j end_case
+case_2:
+    lw $t0,LATE($s0)
+    andi $t0,$t0,0xFFE4
+    sw $t0,LATE($s0)
+    j end_case
+case_3:
+    lw $t0,LATE($s0)
+    andi $t0,$t0,0xFFE8
+    sw $t0,LATE($s0)
+    j end_case
+default:
+    lw $t0,LATE($s0)
+    andi $t0,$t0,0xFFF0
+    sw $t0,LATE($s0)
+    li $a0,2000
+    jal delay
+end_case:
     j while
 end:    
     lw $ra,0($sp)
